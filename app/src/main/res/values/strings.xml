@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Calculator</string>
-    <string name="memcall">MC</string>
+    <string name="memclear">MC</string>
+    <string name="rand">R#</string>
     <string name="memrecall">MR</string>
     <string name="clear">AC</string>
     <string name="backspace">&lt;</string>

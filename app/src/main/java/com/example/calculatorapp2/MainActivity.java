@@ -2,20 +2,24 @@ package com.example.calculatorapp2;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    Button b_memcall, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
+    Button b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
     TextView calcField, historyField;
+    Context context;
+
     String currentCalcText = "";
     ArrayList<String> history = new ArrayList<String>();
-    double currentAnswer = 0, operand = 0;
+    double currentAnswer = 0, operand = 0, memory = 0;
     char lastOperation = '+';
     int opCounter=0;
     boolean negative = false;
@@ -27,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // assigning layout elements to variables
         // buttons
-        b_memcall = findViewById(R.id.b_memcall);
+        b_memclear = findViewById(R.id.b_memclear);
         b_memrecall = findViewById(R.id.b_memrecall);
         b_clear = findViewById(R.id.b_clear);
         b_backspace = findViewById(R.id.b_backspace);
@@ -56,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         historyField = findViewById(R.id.t_history);
 
         // setting onclick listeners to buttons
-        b_memcall.setOnClickListener(this);
+        b_memclear.setOnClickListener(this);
         b_memrecall.setOnClickListener(this);
         b_clear.setOnClickListener(this);
         b_backspace.setOnClickListener(this);
@@ -79,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         b_decimal.setOnClickListener(this);
         b_zero.setOnClickListener(this);
         b_equal.setOnClickListener(this);
+
+        context = getApplicationContext();
 
     }
 
@@ -164,8 +170,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 clearVals();
                 break;
 
-            default:
+            case R.id.b_memadd:
+                memAdd();
+                break;
 
+            case R.id.b_memsub:
+                memSub();
+                break;
+
+            case R.id.b_memclear:
+                memClear();
+                break;
+
+            case R.id.b_memrecall:
+                memRecall();
+                break;
+
+            default:
+                error();
                 break;
         }
     }
@@ -173,15 +195,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void addChar(char c){
         if (currentCalcText.length() < 13){
             currentCalcText += c;
+
+            // clear history if this is first value
+            if(opCounter == 0){
+                displayHistory(history);
+            }
+
+            displayCalc(currentCalcText);
+            operand = Double.valueOf(currentCalcText);
+        } else {
+            error();
         }
 
-        // clear history if this is first value
-        if(opCounter == 0){
-            displayHistory(history);
-        }
-
-        displayCalc(currentCalcText);
-        operand = Double.valueOf(currentCalcText);
     }
 
     public void displayCalc(String text){
@@ -194,6 +219,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             print += hist.get(i);
         }
         historyField.setText(print);
+    }
+
+    public void displayHistory(String input){
+        historyField.setText(input);
     }
 
     // what happens when an operation is clicked (+. -, /, *, =)
@@ -221,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             displayCalc(String.valueOf(currentAnswer));
         }
 
+        // increment counter
         opCounter ++;
 
     }
@@ -240,7 +270,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case '/':
-                currentAnswer /= operand;
+                if (operand == 0){
+                    error();
+                } else {
+                    currentAnswer /= operand;
+                }
                 break;
 
             default:
@@ -283,12 +317,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void error(){
-
+        displayCalc("ERROR");
+        clearVals();
+        displayHistory(history);
     }
 
     public void backspace(){
         currentCalcText = currentCalcText.substring(0, currentCalcText.length()-1);
         displayCalc(currentCalcText);
+    }
+
+    public void memAdd(){
+        // adds current value on screen to memory
+        double screenNumber = Double.parseDouble(calcField.getText().toString());
+        memory += screenNumber;
+        String output = "Added " + screenNumber + " to memory | TOTAL: " + memory;
+        Toast.makeText(context, output, Toast.LENGTH_LONG).show();
+    }
+
+    public void memClear(){
+        memory = 0;
+        String output = "Memory cleared.";
+        Toast.makeText(context, output, Toast.LENGTH_LONG).show();
+    }
+
+    public void memSub(){
+        // subtracts current value to memory
+        double screenNumber = Double.parseDouble(calcField.getText().toString());
+        memory -= screenNumber;
+        String output = "Subtracted " + screenNumber + " from memory | TOTAL: " + memory;
+        Toast.makeText(context, output, Toast.LENGTH_LONG).show();
+    }
+
+    public void memRecall(){
+        // adds current value to memory
+        displayCalc(String.valueOf(memory));
+        clearVals();
+        displayHistory("CURRENT MEMORY VALUE");
     }
 
 }

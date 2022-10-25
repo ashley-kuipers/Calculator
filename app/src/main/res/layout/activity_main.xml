@@ -43,13 +43,13 @@
             android:layout_weight="1">
 
             <Button
-                android:id="@+id/b_memcall"
+                android:id="@+id/b_memclear"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginRight="8dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/medium"
-                android:text="@string/memcall"
+                android:text="@string/memclear"
                 android:textColor="@color/textlight"
                 android:textSize="20sp" />
 
@@ -120,13 +120,14 @@
                 android:textSize="20sp" />
 
             <Button
-                android:id="@+id/b_DELETE"
+                android:id="@+id/b_rand"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/medium"
+                android:text="@string/rand"
                 android:textSize="20sp" />
 
             <Button
