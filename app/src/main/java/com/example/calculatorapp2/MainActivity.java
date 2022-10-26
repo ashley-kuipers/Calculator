@@ -1,5 +1,7 @@
 package com.example.calculatorapp2;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -13,7 +15,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    Button b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
+    Button b_rand, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
     TextView calcField, historyField;
     Context context;
 
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // assigning layout elements to variables
         // buttons
-        b_memclear = findViewById(R.id.b_memclear);
+        b_rand = findViewById(R.id.b_memclear);
         b_memrecall = findViewById(R.id.b_memrecall);
         b_clear = findViewById(R.id.b_clear);
         b_backspace = findViewById(R.id.b_backspace);
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         historyField = findViewById(R.id.t_history);
 
         // setting onclick listeners to buttons
-        b_memclear.setOnClickListener(this);
+        b_rand.setOnClickListener(this);
         b_memrecall.setOnClickListener(this);
         b_clear.setOnClickListener(this);
         b_backspace.setOnClickListener(this);
@@ -86,6 +88,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         context = getApplicationContext();
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentCalcText", calcField.getText().toString());
+        outState.putStringArrayList("history",  history);
+        outState.putDouble("currentAnswer", currentAnswer);
+        outState.putDouble("operand", operand);
+        outState.putDouble("memory", memory);
+        outState.putChar("lastOperation", lastOperation);
+        outState.putInt("opCounter", opCounter);
+        outState.putBoolean("negative", negative);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle saved) {
+        super.onRestoreInstanceState(saved);
+        currentCalcText = saved.getString("currentCalcText");
+        history = saved.getStringArrayList("history");
+        currentAnswer = saved.getDouble("currentAnswer");
+        operand = saved.getDouble("operand");
+        memory = saved.getDouble("memory");
+        lastOperation = saved.getChar("lastOperation");
+        opCounter = saved.getInt("opCounter");
+        negative = saved.getBoolean("negative");
+
+        displayCalc(currentCalcText);
+        currentCalcText = "";
+        displayHistory(history);
     }
 
     public void onClick(View v){
