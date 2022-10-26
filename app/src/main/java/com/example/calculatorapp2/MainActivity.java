@@ -3,18 +3,37 @@ package com.example.calculatorapp2;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    // regular stuff
+    // TODO: Figure out rounding
+    // TODO: add function to undefined button
+    // TODO: add some kind of feedback to the buttons
+    // TODO: comment everything
+    // TODO: suppress leading zeroes
+    // TODO: hide action bar
+
+    // three extra features
+    // TODO: settings screen
+    // TODO: fragment welcome screen
+    // TODO: set up clear error and all clear button
+
     Button b_rand, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
     TextView calcField, historyField;
     Context context;
@@ -26,10 +45,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int opCounter=0;
     boolean negative = false;
 
+
+    private static final int FRAGMENT_FRAME_ID = 10101010;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Objects.requireNonNull(getSupportActionBar()).hide();
+
 
         // assigning layout elements to variables
         // buttons
@@ -86,7 +110,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         b_zero.setOnClickListener(this);
         b_equal.setOnClickListener(this);
 
-        context = getApplicationContext();
+        FragmentManager fr = getSupportFragmentManager();
+        FragmentTransaction ft = fr.beginTransaction();
+        Welcome welcome = new Welcome();
+        ft.add(R.id.layout_welcome, welcome);
+        ft.commit();
 
     }
 

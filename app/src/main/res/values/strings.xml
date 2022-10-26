@@ -25,4 +25,10 @@
     <string name="decimal">.</string>
     <string name="sign">+/-</string>
     <string name="def">0</string>
+    <string name="start">Start</string>
+    <string name="welcomeTitle">Welcome!</string>
+    <string name="welcomeText">Thank you for using my calculator. Press start to begin.</string>
+    <string name="author">By Ashley Kuipers</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

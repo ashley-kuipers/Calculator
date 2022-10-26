@@ -10,6 +10,13 @@
     android:padding="24dp"
     tools:context=".MainActivity">
 
+    <FrameLayout
+        android:id="@+id/layout_welcome"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
     <TextView
         android:id="@+id/t_calc"
         android:layout_width="match_parent"
@@ -358,4 +365,5 @@
         </TableRow>
 
     </TableLayout>
+
 </LinearLayout>
