@@ -31,8 +31,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // three extra features
     // TODO: settings screen
-    // TODO: fragment welcome screen
-    // TODO: set up clear error and all clear button
 
     Button b_rand, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
     TextView calcField, historyField;
@@ -43,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     double currentAnswer = 0, operand = 0, memory = 0;
     char lastOperation = '+';
     int opCounter=0;
-    boolean negative = false;
+    boolean negative = false, allClear = true;
 
 
     private static final int FRAGMENT_FRAME_ID = 10101010;
@@ -196,9 +194,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.b_clear:
-                clearVals();
-                displayCalc("0");
-                displayHistory(history);
+                if (!allClear){
+                    // clear only current value
+                    currentCalcText = "";
+                    displayCalc("0");
+                    b_clear.setText("AC");
+                } else {
+                    // clear all values
+                    b_clear.setText("CE");
+                    clearVals();
+                    displayCalc("0");
+                    displayHistory(history);
+                }
+                allClear = !allClear;
                 break;
 
             case R.id.b_backspace:
@@ -263,6 +271,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             displayCalc(currentCalcText);
             operand = Double.valueOf(currentCalcText);
+
+            b_clear.setText("CE");
+            allClear = false;
         } else {
             error();
         }
@@ -312,6 +323,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // increment counter
         opCounter ++;
+
+        // change clear back to AC
+        b_clear.setText("AC");
+        allClear = true;
 
     }
 

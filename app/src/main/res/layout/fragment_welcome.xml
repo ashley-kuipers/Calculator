@@ -55,6 +55,6 @@
         android:text="@string/author"
         android:textAlignment="center"
         android:textColor="@color/text"
-        android:textSize="18sp" />
+        android:textSize="20sp" />
 
 </LinearLayout>
