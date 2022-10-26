@@ -35,16 +35,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button b_rand, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
     TextView calcField, historyField;
     Context context;
+    Welcome welcome;
 
     String currentCalcText = "";
     ArrayList<String> history = new ArrayList<String>();
     double currentAnswer = 0, operand = 0, memory = 0;
     char lastOperation = '+';
     int opCounter=0;
-    boolean negative = false, allClear = true;
-
-
-    private static final int FRAGMENT_FRAME_ID = 10101010;
+    boolean negative = false, allClear = true, welcomed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,12 +106,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         b_zero.setOnClickListener(this);
         b_equal.setOnClickListener(this);
 
+
         FragmentManager fr = getSupportFragmentManager();
         FragmentTransaction ft = fr.beginTransaction();
-        Welcome welcome = new Welcome();
+        welcome = new Welcome();
         ft.add(R.id.layout_welcome, welcome);
         ft.commit();
 
+
+
+    }
+
+    public void fragmentClicked(boolean isClicked){
+        welcomed = isClicked;
     }
 
     @Override
@@ -127,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putChar("lastOperation", lastOperation);
         outState.putInt("opCounter", opCounter);
         outState.putBoolean("negative", negative);
+        outState.putBoolean("welcomed", welcomed);
     }
 
     @Override
@@ -140,6 +146,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lastOperation = saved.getChar("lastOperation");
         opCounter = saved.getInt("opCounter");
         negative = saved.getBoolean("negative");
+        welcomed = saved.getBoolean("welcomed");
+
+        if(welcomed){
+            welcome.b_start.performClick();
+        }
 
         displayCalc(currentCalcText);
         currentCalcText = "";

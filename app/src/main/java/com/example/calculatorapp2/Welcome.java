@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 
 public class Welcome extends Fragment {
     Button b_start;
+    boolean clicked = true;
 
     public Welcome() {
         // Required empty public constructor
@@ -38,9 +39,10 @@ public class Welcome extends Fragment {
                 container.removeView(view);
                 container.setLayoutParams(new LinearLayout.LayoutParams(
                         0, 0));
+
+                mainAct.fragmentClicked(true);
             }
         });
-
 
         return view;
     }
