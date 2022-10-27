@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Calculator</string>
     <string name="memclear">MC</string>
-    <string name="rand">R#</string>
+    <string name="rand">?</string>
     <string name="memrecall">MR</string>
     <string name="clear">AC</string>
     <string name="backspace">&lt;</string>
@@ -25,10 +25,18 @@
     <string name="decimal">.</string>
     <string name="sign">+/-</string>
     <string name="def">0</string>
+    <string name="base2">B<sub>2</sub></string>
+    <string name="base8">B<sub>8</sub></string>
+    <string name="base10">B<sub>10</sub></string>
+    <string name="hex">Hx</string>
     <string name="start">Start</string>
     <string name="welcomeTitle">Welcome!</string>
     <string name="welcomeText">Thank you for using my calculator. Press start to begin.</string>
     <string name="author">By Ashley Kuipers</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="saveButton">Save</string>
+    <string name="discardButton">&lt;- Back</string>
+    <string name="negColorText">Show negative numbers in red</string>
+    <string name="darkModeText">Dark Mode</string>
+    <string name="fontSizeRadio">A</string>
+    <string name="fontSizeText">Font Size</string>
 </resources>

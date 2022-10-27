@@ -13,16 +13,9 @@ import android.widget.LinearLayout;
 
 public class Welcome extends Fragment {
     Button b_start;
-    boolean clicked = true;
 
     public Welcome() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -37,8 +30,7 @@ public class Welcome extends Fragment {
                 MainActivity mainAct = (MainActivity) getActivity();
                 view.findViewById(R.id.welcome_layout).setVisibility(View.GONE);
                 container.removeView(view);
-                container.setLayoutParams(new LinearLayout.LayoutParams(
-                        0, 0));
+                container.setLayoutParams(new LinearLayout.LayoutParams(0, 0));
 
                 mainAct.fragmentClicked(true);
             }

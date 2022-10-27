@@ -13,7 +13,7 @@
     <FrameLayout
         android:id="@+id/layout_welcome"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
     </FrameLayout>
 
@@ -38,6 +38,13 @@
         android:textAlignment="textEnd"
         android:textSize="14sp" />
 
+    <FrameLayout
+        android:id="@+id/layout_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </FrameLayout>
+
     <TableLayout
         android:id="@+id/calc_buttons"
         android:layout_width="match_parent"
@@ -50,67 +57,13 @@
             android:layout_weight="1">
 
             <Button
-                android:id="@+id/b_memclear"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/medium"
-                android:text="@string/memclear"
-                android:textColor="@color/textlight"
-                android:textSize="20sp" />
-
-            <Button
-                android:id="@+id/b_memrecall"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/medium"
-                android:text="@string/memrecall"
-                android:textColor="@color/textlight"
-                android:textSize="20sp" />
-
-            <Button
-                android:id="@+id/b_clear"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/medium"
-                android:text="@string/clear"
-                android:textColor="@color/textlight"
-                android:textSize="20sp" />
-
-            <Button
                 android:id="@+id/b_backspace"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/medium"
                 android:text="@string/backspace"
-                android:textColor="@color/textlight"
-                android:textSize="20sp" />
-
-        </TableRow>
-
-        <TableRow
-            android:id="@+id/row_2"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <Button
-                android:id="@+id/b_memsub"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/medium"
-                android:text="@string/memsub"
                 android:textColor="@color/textlight"
                 android:textSize="20sp" />
 
@@ -127,14 +80,70 @@
                 android:textSize="20sp" />
 
             <Button
-                android:id="@+id/b_rand"
+                android:id="@+id/b_memsub"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/medium"
+                android:text="@string/memsub"
+                android:textColor="@color/textlight"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/b_settings"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/medium"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:text="@string/rand"
+                android:textSize="28sp" />
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/row_2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <Button
+                android:id="@+id/b_clear"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/medium"
+                android:text="@string/clear"
+                android:textColor="@color/textlight"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/b_memclear"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/medium"
+                android:text="@string/memclear"
+                android:textColor="@color/textlight"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/b_memrecall"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/medium"
-                android:text="@string/rand"
+                android:text="@string/memrecall"
+                android:textColor="@color/textlight"
                 android:textSize="20sp" />
 
             <Button
@@ -321,7 +330,7 @@
                 android:id="@+id/b_sign"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/medium"
                 android:text="@string/sign"

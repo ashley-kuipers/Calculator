@@ -1,19 +1,14 @@
 package com.example.calculatorapp2;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +27,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // three extra features
     // TODO: settings screen
 
-    Button b_rand, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
+    Button b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal, b_settings;
     TextView calcField, historyField;
     Context context;
     Welcome welcome;
+    Settings settings;
 
     String currentCalcText = "";
     ArrayList<String> history = new ArrayList<String>();
@@ -50,10 +46,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-
         // assigning layout elements to variables
         // buttons
-        b_rand = findViewById(R.id.b_memclear);
+        b_memclear = findViewById(R.id.b_memclear);
         b_memrecall = findViewById(R.id.b_memrecall);
         b_clear = findViewById(R.id.b_clear);
         b_backspace = findViewById(R.id.b_backspace);
@@ -76,13 +71,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         b_decimal = findViewById(R.id.b_decimal);
         b_zero = findViewById(R.id.b_zero);
         b_equal = findViewById(R.id.b_equal);
+        b_settings = findViewById(R.id.b_settings);
 
         // fields
         calcField = findViewById(R.id.t_calc);
         historyField = findViewById(R.id.t_history);
 
         // setting onclick listeners to buttons
-        b_rand.setOnClickListener(this);
+        b_memclear.setOnClickListener(this);
         b_memrecall.setOnClickListener(this);
         b_clear.setOnClickListener(this);
         b_backspace.setOnClickListener(this);
@@ -105,20 +101,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         b_decimal.setOnClickListener(this);
         b_zero.setOnClickListener(this);
         b_equal.setOnClickListener(this);
+        b_settings.setOnClickListener(this);
 
-
+        // starts welcome screen fragment
         FragmentManager fr = getSupportFragmentManager();
         FragmentTransaction ft = fr.beginTransaction();
         welcome = new Welcome();
         ft.add(R.id.layout_welcome, welcome);
         ft.commit();
-
-
-
     }
 
+    // lets us know that the welcome fragment has been clicked for save state
     public void fragmentClicked(boolean isClicked){
         welcomed = isClicked;
+    }
+
+    public void settings(){
+        // if settings is closed, open it (fragment == null)
+        FragmentManager fr = getSupportFragmentManager();
+        FragmentTransaction ft = fr.beginTransaction();
+        settings = new Settings();
+        ft.add(R.id.layout_settings, settings);
+        ft.commit();
+
+        // if settings is open, close it
+
     }
 
     @Override
@@ -263,6 +270,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.b_memrecall:
                 memRecall();
+                break;
+
+            case R.id.b_settings:
+                settings();
                 break;
 
             default:
