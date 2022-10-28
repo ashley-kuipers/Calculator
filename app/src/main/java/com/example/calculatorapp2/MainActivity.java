@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -18,32 +19,29 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     // regular stuff
     // TODO: Figure out rounding
-    // TODO: add function to undefined button
     // TODO: add some kind of feedback to the buttons
     // TODO: comment everything
     // TODO: suppress leading zeroes
-    // TODO: hide action bar
+    // TODO: logic of clear/all clear buttons not quite right
 
-    // three extra features
-    // TODO: settings screen
-
-    Button b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal, b_settings;
+    // declaring global variables
+    Button b_help, b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
     TextView calcField, historyField;
     Context context;
     Welcome welcome;
-    Settings settings;
-
     String currentCalcText = "";
     ArrayList<String> history = new ArrayList<String>();
     double currentAnswer = 0, operand = 0, memory = 0;
     char lastOperation = '+';
     int opCounter=0;
-    boolean negative = false, allClear = true, welcomed = false;
+    boolean negative = false, allClear = true, welcomed = false, helpMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // hide default action bar (adds more room to calc screen)
         Objects.requireNonNull(getSupportActionBar()).hide();
 
         // assigning layout elements to variables
@@ -71,13 +69,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         b_decimal = findViewById(R.id.b_decimal);
         b_zero = findViewById(R.id.b_zero);
         b_equal = findViewById(R.id.b_equal);
-        b_settings = findViewById(R.id.b_settings);
+        b_help = findViewById(R.id.b_help);
 
-        // fields
+        // TextViews
         calcField = findViewById(R.id.t_calc);
         historyField = findViewById(R.id.t_history);
 
-        // setting onclick listeners to buttons
+        // Setting onclick listeners to buttons
         b_memclear.setOnClickListener(this);
         b_memrecall.setOnClickListener(this);
         b_clear.setOnClickListener(this);
@@ -101,7 +99,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         b_decimal.setOnClickListener(this);
         b_zero.setOnClickListener(this);
         b_equal.setOnClickListener(this);
-        b_settings.setOnClickListener(this);
+        b_help.setOnClickListener(this);
+
+        // getting context for Toasts
+        context = getApplicationContext();
 
         // starts welcome screen fragment
         FragmentManager fr = getSupportFragmentManager();
@@ -111,22 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ft.commit();
     }
 
-    // lets us know that the welcome fragment has been clicked for save state
-    public void fragmentClicked(boolean isClicked){
-        welcomed = isClicked;
-    }
 
-    public void settings(){
-        // if settings is closed, open it (fragment == null)
-        FragmentManager fr = getSupportFragmentManager();
-        FragmentTransaction ft = fr.beginTransaction();
-        settings = new Settings();
-        ft.add(R.id.layout_settings, settings);
-        ft.commit();
-
-        // if settings is open, close it
-
-    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -168,118 +154,235 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // gives function to each button
         switch (v.getId()){
             case R.id.b_zero:
-                addChar('0');
+                if (helpMode){
+                    displayHistory("The number zero");
+                } else {
+                    addChar('0');
+                }
                 break;
 
             case R.id.b_one:
-                addChar('1');
+                if (helpMode){
+                    displayHistory("The number one");
+                } else {
+                    addChar('1');
+                }
                 break;
 
             case R.id.b_two:
-                addChar('2');
+                if (helpMode){
+                    displayHistory("The number two");
+                } else {
+                    addChar('2');
+                }
                 break;
 
             case R.id.b_three:
-                addChar('3');
+                if (helpMode){
+                    displayHistory("The number three");
+                } else {
+                    addChar('3');
+                }
                 break;
 
             case R.id.b_four:
-                addChar('4');
+                if (helpMode){
+                    displayHistory("The number four");
+                } else {
+                    addChar('4');
+                }
                 break;
 
             case R.id.b_five:
-                addChar('5');
+                if (helpMode){
+                    displayHistory("The number five");
+                } else {
+                    addChar('5');
+                }
                 break;
 
             case R.id.b_six:
-                addChar('6');
+                if (helpMode){
+                    displayHistory("The number six");
+                } else {
+                    addChar('6');
+                }
                 break;
 
             case R.id.b_seven:
-                addChar('7');
+                if (helpMode){
+                    displayHistory("The number seven");
+                } else {
+                    addChar('7');
+                }
                 break;
 
             case R.id.b_eight:
-                addChar('8');
+                if (helpMode){
+                    displayHistory("The number eight");
+                } else {
+                    addChar('8');
+                }
                 break;
 
             case R.id.b_nine:
-                addChar('9');
+                if (helpMode){
+                    displayHistory("The number nine");
+                } else {
+                    addChar('9');
+                }
                 break;
 
             case R.id.b_decimal:
-                addChar('.');
+                if (helpMode){
+                    displayHistory("The decimal point");
+                } else {
+                    addChar('.');
+                }
                 break;
 
             case R.id.b_clear:
+
                 if (!allClear){
-                    // clear only current value
-                    currentCalcText = "";
-                    displayCalc("0");
-                    b_clear.setText("AC");
-                } else {
-                    // clear all values
-                    b_clear.setText("CE");
-                    clearVals();
-                    displayCalc("0");
-                    displayHistory(history);
+                    if (helpMode){
+                        displayHistory("CE: Clears only current value");
+                    } else {
+                        // clear only current value
+                        currentCalcText = "";
+                        displayCalc("0");
+                        b_clear.setText("AC");
+                        allClear = !allClear;
+
+                    }
+                } else if(opCounter > 0 && allClear){
+                    if (helpMode){
+                        displayHistory("AC: Clears all history (except stored memory)");
+                    } else {
+                        // clear all values
+                        b_clear.setText("CE");
+                        clearVals();
+                        displayCalc("0");
+                        displayHistory(history);
+
+                    }
                 }
-                allClear = !allClear;
                 break;
 
             case R.id.b_backspace:
-                backspace();
+                if (helpMode){
+                    displayHistory("Backspace one character at a time.");
+                } else {
+                    backspace();
+                }
                 break;
 
             case R.id.b_sign:
-                sign();
+                if (helpMode){
+                    displayHistory("Change sign of number on screen");
+                } else {
+                    sign();
+                }
                 break;
 
             case R.id.b_add:
-                calculate('+');
+                if (helpMode){
+                    displayHistory("Addition button");
+                } else {
+                    calculate('+');
+                }
                 break;
 
             case R.id.b_sub:
-                calculate('-');
+                if (helpMode){
+                    displayHistory("Subtraction button");
+                } else {
+                    calculate('-');
+                }
                 break;
 
             case R.id.b_multiply:
-                calculate('*');
+                if (helpMode){
+                    displayHistory("Multiply button");
+                } else {
+                    calculate('*');
+                }
                 break;
 
             case R.id.b_divide:
-                calculate('/');
+                if (helpMode){
+                    displayHistory("Divide button");
+                } else {
+                    calculate('/');
+                }
                 break;
 
             case R.id.b_equal:
-                calculate('=');
-                clearVals();
+                if (helpMode){
+                    displayHistory("Equals button. Gives total of all operations");
+                } else {
+                    calculate('=');
+                }
                 break;
 
             case R.id.b_memadd:
-                memAdd();
+                if (helpMode){
+                    displayHistory("Adds number on screen to current memory value");
+                } else {
+                    memAdd();
+                }
                 break;
 
             case R.id.b_memsub:
-                memSub();
+                if (helpMode){
+                    displayHistory("Subtracts number on screen from memory value");
+                } else {
+                    memSub();
+                }
                 break;
 
             case R.id.b_memclear:
-                memClear();
+                if (helpMode){
+                    displayHistory("Clears current stored memory value");
+                } else {
+                    memAdd();
+                }
                 break;
 
             case R.id.b_memrecall:
-                memRecall();
+                if (helpMode){
+                    displayHistory("Displays current stored memory value");
+                } else {
+                    memRecall();
+                }
                 break;
 
-            case R.id.b_settings:
-                settings();
+            case R.id.b_help:
+                help();
                 break;
 
             default:
                 error();
                 break;
         }
+    }
+
+    public void help(){
+        String out = "";
+         if(!helpMode){
+             helpMode = true;
+             // turn background of button darker
+             out += "Help-mode is on. Press any button.";
+         } else {
+             helpMode = false;
+             out += "Help-mode off";
+             if(currentCalcText.length()>0){
+                 displayCalc(currentCalcText);
+             } else {
+                 displayCalc("0");
+             }
+             displayHistory(history);
+         }
+         Toast.makeText(context, out, Toast.LENGTH_LONG).show();
     }
 
     public void addChar(char c){
@@ -451,6 +554,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         displayCalc(String.valueOf(memory));
         clearVals();
         displayHistory("CURRENT MEMORY VALUE");
+    }
+
+    // lets us know that the welcome fragment has been clicked for save state
+    public void fragmentClicked(boolean isClicked){
+        welcomed = isClicked;
     }
 
 }
