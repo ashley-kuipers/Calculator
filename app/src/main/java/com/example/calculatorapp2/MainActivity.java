@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // Declaring global variables
     Button b_help, b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
-    TextView calcField, historyField;
+    TextView calcField, historyField, signField;
     Context context;
     Welcome welcome;
     String currentCalcText = "";
@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // TextViews
         calcField = findViewById(R.id.t_calc);
         historyField = findViewById(R.id.t_history);
+        signField = findViewById(R.id.t_sign);
 
         // Setting onclick listeners to buttons
         b_memclear.setOnClickListener(this);
@@ -315,6 +316,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // When a digit/decimal is pressed, this adds it to the current working number
     public void addChar(char c){
         if (currentCalcText.length() < 13){
+            if(negative){
+                displaySign(true);
+            } else {
+                displaySign(false);
+            }
             // adds character to the current calculator text
             currentCalcText += c;
 
@@ -328,6 +334,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             // updates the current operand to the value on the calc screen
             operand = Double.valueOf(currentCalcText);
+            if(negative){
+                operand *= -1;
+            }
 
             // changes the clear button text to CE so if pressed, it will clear only the current number
             b_clear.setText("CE");
@@ -352,6 +361,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         historyField.setText(print);
     }
 
+    // Displays the sign on the sign textview
+    public void displaySign(boolean neg){
+        if (neg){
+            signField.setText("-");
+        } else {
+            signField.setText("");
+        }
+    }
+
     // Overloaded function, displays the inputted text on the history textview (for help mode, etc)
     public void displayHistory(String input){
         historyField.setText(input);
@@ -360,12 +378,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // The stuff that happens when an operator is pressed (+. -, /, *, =)
     public void calculate(char op){
         // add currentCalcText and the current operation to history, and displays on history field
-        history.add(currentCalcText);
+        if(negative){
+            history.add("-" + currentCalcText);
+        } else {
+            history.add(currentCalcText);
+        }
         history.add(String.valueOf(op));
         displayHistory(history);
 
         // clears the calcText (so a new number can be started)
         currentCalcText = "";
+        negative = false;
 
         // operate on numbers
         // In order to have a running total, we are always running on the previous operator
@@ -380,11 +403,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lastOperation = op;
 
         // display running total to the calculator screen
-        BigDecimal bd = BigDecimal.valueOf(currentAnswer);
-        MathContext m = new MathContext(11);
-        bd = bd.round(m);
-        Log.d("TAG", "BD: " + bd);
-        displayCalc(bd.toPlainString());
+        if(currentAnswer<1){
+            displayCalc(String.valueOf(currentAnswer*-1));
+            displaySign(true);
+        } else {
+            displayCalc(String.valueOf(currentAnswer));
+        }
+
+//        BigDecimal bd = BigDecimal.valueOf(currentAnswer);
+//        MathContext m = new MathContext(11);
+//        bd = bd.round(m);
+//        Log.d("TAG", "BD: " + bd);
+//        displayCalc(bd.toPlainString());
 
         // increment the operation counter
         opCounter ++;
@@ -459,16 +489,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void sign(){
         if (!negative){
             // change number to negative on screen
-            currentCalcText = "-" + currentCalcText;
-            displayCalc(currentCalcText);
-
             negative = true;
+            displaySign(true);
 
         } else {
             // change to positive on screen
-            currentCalcText = currentCalcText.substring(1, currentCalcText.length());
-            displayCalc(currentCalcText);
-
+            displaySign(false);
             negative = false;
 
         }
@@ -535,6 +561,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void memAdd(){
         // gets value from screen
         double screenNumber = Double.parseDouble(calcField.getText().toString());
+        if(signField.getText().toString().equals("-")){
+            screenNumber *= -1;
+        }
         // adds to memory
         memory += screenNumber;
         // displays a toast updating the user about their action and the memory total
@@ -555,6 +584,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void memSub(){
         // gets the current number from the screen
         double screenNumber = Double.parseDouble(calcField.getText().toString());
+        if(signField.getText().toString().equals("-")){
+            screenNumber *= -1;
+        }
         // subtracts from memory
         memory -= screenNumber;
         // displays a toast updating the user about their action and the memory total
@@ -607,9 +639,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             welcome.b_start.performClick();
         }
 
+        // if was in help mode before, activate again
         if(helpMode){
             b_help.setBackgroundColor(getResources().getColor(R.color.lightest));
             b_help.setTextColor(getResources().getColor(R.color.text));
+        }
+
+        // if number was negative before, display sign
+        if(negative){
+            displaySign(true);
         }
 
         // display saved values to screen
