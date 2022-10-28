@@ -19,10 +19,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     // regular stuff
     // TODO: Figure out rounding
-    // TODO: add some kind of feedback to the buttons
-    // TODO: comment everything
     // TODO: suppress leading zeroes
-    // TODO: logic of clear/all clear buttons not quite right
 
     // declaring global variables
     Button b_help, b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
@@ -33,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> history = new ArrayList<String>();
     double currentAnswer = 0, operand = 0, memory = 0;
     char lastOperation = '+';
-    int opCounter=0;
+    int opCounter=0, helped = 0;
     boolean negative = false, allClear = true, welcomed = false, helpMode = false;
 
     @Override
@@ -112,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ft.commit();
     }
 
-    // adds function to each calculator button (if in help mode, each button displays it's use in the history field)
+    // Adds function to each calculator button (if in help mode, each button displays it's use in the history field)
     public void onClick(View v){
         switch (v.getId()){
             case R.id.b_zero:
@@ -204,35 +201,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.b_clear:
-                // displays CE when entering a number (to delete that number if you wish) and then after one click, will display AC to clear the entire history
-                if (!allClear){
-                    if (helpMode){
+                if(helpMode){
+                    if(!allClear){
                         displayHistory("CE: Clears only current value");
                     } else {
-                        // clear only current value
-                        currentCalcText = "";
-                        displayCalc("0");
-                        b_clear.setText("AC");
-                        allClear = !allClear;
-
-                    }
-                } else if(opCounter > 0 && allClear){
-                    if (helpMode){
                         displayHistory("AC: Clears all history (except stored memory)");
-                    } else {
-                        // clear all values
-                        b_clear.setText("CE");
-                        clearVals();
-                        displayCalc("0");
-                        displayHistory(history);
-
                     }
+                } else {
+                    clear();
                 }
                 break;
 
             case R.id.b_backspace:
                 if (helpMode){
-                    displayHistory("Backspace one character at a time.");
+                    displayHistory("Backspace: remove one character at a time.");
                 } else {
                     backspace();
                 }
@@ -280,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.b_equal:
                 if (helpMode){
-                    displayHistory("Equals button. Gives total of all operations");
+                    displayHistory("Equals button");
                 } else {
                     calculate('=');
                 }
@@ -306,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (helpMode){
                     displayHistory("Clears current stored memory value");
                 } else {
-                    memAdd();
+                    memClear();
                 }
                 break;
 
@@ -440,6 +422,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // Clear button: displays CE when entering a number (to delete just current working number) and then after one click, will display AC (to clear the entire history)
+    public void clear(){
+        if (!allClear){
+            // clear only current value
+            currentCalcText = "";
+            b_clear.setText("AC");
+            allClear = !allClear;
+            displayCalc("0");
+            displayHistory(history);
+
+        } else if(opCounter > 0 && allClear){
+            // clear all values
+            clearVals();
+            displayCalc("0");
+            displayHistory(history);
+        }
+    }
+
     // Clears the stored values
     public void clearVals(){
         currentCalcText = "";
@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         history.clear();
     }
 
-    // changes the sign of the current number on the calculator screen
+    // Changes the sign of the current number on the calculator screen
     public void sign(){
         if (!negative){
             // change number to negative on screen
@@ -491,21 +491,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(!helpMode){
             // turn help mode on
             helpMode = true;
-            // TODO: turn background of button darker
+
+            // changes colors of buttons so user can tell when mode is on/off
+            b_help.setBackgroundColor(getResources().getColor(R.color.lightest));
+            b_help.setTextColor(getResources().getColor(R.color.text));
+
+            // update output for toast
             out += "Help-mode is on. Press any button.";
         } else {
             // turn help mode off
             helpMode = false;
-            out += "Help-mode off";
+
+            // changes colors of buttons to user can tell when mode is on/off
+            b_help.setBackgroundColor(getResources().getColor(R.color.medium));
+            b_help.setTextColor(getResources().getColor(R.color.textlight));
+
+            // redisplays currentCalcText and history from before help mode was turned on
             if(currentCalcText.length()>0){
                 displayCalc(currentCalcText);
             } else {
                 displayCalc("0");
             }
             displayHistory(history);
+
+            // update output for toast
+            out += "Help-mode off";
         }
-        // notifies the user when help mode is enabled or disabled
-        Toast.makeText(context, out, Toast.LENGTH_LONG).show();
+        // notifies the user when help mode is enabled or disabled the first time they use it
+        if (helped < 2){
+            Toast.makeText(context, out, Toast.LENGTH_LONG).show();
+        }
+        helped++;
+
     }
 
     // Adds current value on calculator to stored memory
@@ -546,7 +563,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         displayHistory("CURRENT MEMORY VALUE");
     }
 
-    // saves variables for when app is in background or rotates
+    // Saves variables for when app is in background or rotates
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -559,9 +576,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putInt("opCounter", opCounter);
         outState.putBoolean("negative", negative);
         outState.putBoolean("welcomed", welcomed);
+        outState.putBoolean("helpMode", helpMode);
+        outState.putInt("helped", helped);
     }
 
-    // restores variables after app comes back to front or rotates
+    // Restores variables after app comes back to front or rotates
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle saved) {
         super.onRestoreInstanceState(saved);
@@ -574,10 +593,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         opCounter = saved.getInt("opCounter");
         negative = saved.getBoolean("negative");
         welcomed = saved.getBoolean("welcomed");
+        helpMode = saved.getBoolean("helpMode");
+        helped = saved.getInt("helped");
 
         // if the welcome screen has already been dismissed, dismiss it again on restore
         if(welcomed){
             welcome.b_start.performClick();
+        }
+
+        if(helpMode){
+            b_help.setBackgroundColor(getResources().getColor(R.color.lightest));
+            b_help.setTextColor(getResources().getColor(R.color.text));
         }
 
         // display saved values to screen
