@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // TODO: Figure out rounding
     // TODO: suppress leading zeroes
 
-    // declaring global variables
+    // Declaring global variables
     Button b_help, b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
     TextView calcField, historyField;
     Context context;
@@ -433,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             displayHistory(history);
 
         } else if(opCounter > 0 && allClear){
-            // clear all values
+            // clear all values and history
             clearVals();
             displayCalc("0");
             displayHistory(history);
