@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -378,7 +380,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lastOperation = op;
 
         // display running total to the calculator screen
-        displayCalc(String.valueOf(currentAnswer));
+        BigDecimal bd = BigDecimal.valueOf(currentAnswer);
+        MathContext m = new MathContext(11);
+        bd = bd.round(m);
+        Log.d("TAG", "BD: " + bd);
+        displayCalc(bd.toPlainString());
 
         // increment the operation counter
         opCounter ++;
