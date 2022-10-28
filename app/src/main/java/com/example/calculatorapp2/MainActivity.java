@@ -112,46 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ft.commit();
     }
 
-
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("currentCalcText", calcField.getText().toString());
-        outState.putStringArrayList("history",  history);
-        outState.putDouble("currentAnswer", currentAnswer);
-        outState.putDouble("operand", operand);
-        outState.putDouble("memory", memory);
-        outState.putChar("lastOperation", lastOperation);
-        outState.putInt("opCounter", opCounter);
-        outState.putBoolean("negative", negative);
-        outState.putBoolean("welcomed", welcomed);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle saved) {
-        super.onRestoreInstanceState(saved);
-        currentCalcText = saved.getString("currentCalcText");
-        history = saved.getStringArrayList("history");
-        currentAnswer = saved.getDouble("currentAnswer");
-        operand = saved.getDouble("operand");
-        memory = saved.getDouble("memory");
-        lastOperation = saved.getChar("lastOperation");
-        opCounter = saved.getInt("opCounter");
-        negative = saved.getBoolean("negative");
-        welcomed = saved.getBoolean("welcomed");
-
-        if(welcomed){
-            welcome.b_start.performClick();
-        }
-
-        displayCalc(currentCalcText);
-        currentCalcText = "";
-        displayHistory(history);
-    }
-
+    // adds function to each calculator button (if in help mode, each button displays it's use in the history field)
     public void onClick(View v){
-        // gives function to each button
         switch (v.getId()){
             case R.id.b_zero:
                 if (helpMode){
@@ -242,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.b_clear:
-
+                // displays CE when entering a number (to delete that number if you wish) and then after one click, will display AC to clear the entire history
                 if (!allClear){
                     if (helpMode){
                         displayHistory("CE: Clears only current value");
@@ -366,37 +328,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void help(){
-        String out = "";
-         if(!helpMode){
-             helpMode = true;
-             // turn background of button darker
-             out += "Help-mode is on. Press any button.";
-         } else {
-             helpMode = false;
-             out += "Help-mode off";
-             if(currentCalcText.length()>0){
-                 displayCalc(currentCalcText);
-             } else {
-                 displayCalc("0");
-             }
-             displayHistory(history);
-         }
-         Toast.makeText(context, out, Toast.LENGTH_LONG).show();
-    }
-
+    // When a digit/decimal is pressed, this adds it to the current working number
     public void addChar(char c){
         if (currentCalcText.length() < 13){
+            // adds character to the current calculator text
             currentCalcText += c;
 
-            // clear history if this is first value
+            // displays the empty history arraylist if no operations have happened yet (effectively clears the history after the equals sign has been used)
             if(opCounter == 0){
                 displayHistory(history);
             }
 
+            // displays the current number on calc screen
             displayCalc(currentCalcText);
+
+            // updates the current operand to the value on the calc screen
             operand = Double.valueOf(currentCalcText);
 
+            // changes the clear button text to CE so if pressed, it will clear only the current number
             b_clear.setText("CE");
             allClear = false;
         } else {
@@ -405,10 +354,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    // Displays the inputted text on the calculator screen textview
     public void displayCalc(String text){
         calcField.setText(text);
     }
 
+    // Displays the inputted history arraylist on the history textview
     public void displayHistory(ArrayList<String> hist){
         String print = "";
         for (int i=0; i < hist.size(); i++){
@@ -417,44 +368,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         historyField.setText(print);
     }
 
+    // Overloaded function, displays the inputted text on the history textview (for help mode, etc)
     public void displayHistory(String input){
         historyField.setText(input);
     }
 
-    // what happens when an operation is clicked (+. -, /, *, =)
+    // The stuff that happens when an operator is pressed (+. -, /, *, =)
     public void calculate(char op){
-        // add currentCalcText to history
+        // add currentCalcText and the current operation to history, and displays on history field
         history.add(currentCalcText);
         history.add(String.valueOf(op));
-
-        // display history
         displayHistory(history);
 
-        // clear calcText
+        // clears the calcText (so a new number can be started)
         currentCalcText = "";
 
         // operate on numbers
+        // In order to have a running total, we are always running on the previous operator
+        // if this is the first operation, the current operand will display as the running total
         if(opCounter == 0){
             currentAnswer = operand;
         } else {
+            // operates on the previous operator
             operate(lastOperation);
         }
+        // updates previous operation with value of the current one
         lastOperation = op;
 
-        // display intermediate total
-        if (opCounter > 0){
-            displayCalc(String.valueOf(currentAnswer));
-        }
+        // display running total to the calculator screen
+        displayCalc(String.valueOf(currentAnswer));
 
-        // increment counter
+        // increment the operation counter
         opCounter ++;
 
-        // change clear back to AC
+        // change clear button text back to AC
         b_clear.setText("AC");
         allClear = true;
 
     }
 
+    // Completes a specified operation and updates the global value currentAnswer
     public void operate(char op){
         switch (op){
             case '+':
@@ -470,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case '/':
+                // accounts for the divide by 0 scenario
                 if (operand == 0){
                     error();
                 } else {
@@ -479,12 +433,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             default:
                 error();
+                // since we always add to the operation counter in the calculate function, need to subtract an operation if there is an error
                 opCounter--;
                 break;
 
         }
     }
 
+    // Clears the stored values
     public void clearVals(){
         currentCalcText = "";
         operand = 0;
@@ -493,17 +449,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         history.clear();
     }
 
+    // changes the sign of the current number on the calculator screen
     public void sign(){
         if (!negative){
-            // change to negative
-            // on calc screen
+            // change number to negative on screen
             currentCalcText = "-" + currentCalcText;
             displayCalc(currentCalcText);
 
             negative = true;
 
         } else {
-            // change to positive
+            // change to positive on screen
             currentCalcText = currentCalcText.substring(1, currentCalcText.length());
             displayCalc(currentCalcText);
 
@@ -511,52 +467,126 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
-        // change sign of operand
+        // change sign of current working number
         operand *= -1;
 
     }
 
+    // Displays an error and clears the values and history whenever an error occurs
     public void error(){
         displayCalc("ERROR");
         clearVals();
         displayHistory(history);
     }
 
+    // Removes one digit at a time from the current working number
     public void backspace(){
         currentCalcText = currentCalcText.substring(0, currentCalcText.length()-1);
         displayCalc(currentCalcText);
     }
 
+    // Enables help mode (makes every button display it's function on click)
+    public void help(){
+        String out = "";
+        if(!helpMode){
+            // turn help mode on
+            helpMode = true;
+            // TODO: turn background of button darker
+            out += "Help-mode is on. Press any button.";
+        } else {
+            // turn help mode off
+            helpMode = false;
+            out += "Help-mode off";
+            if(currentCalcText.length()>0){
+                displayCalc(currentCalcText);
+            } else {
+                displayCalc("0");
+            }
+            displayHistory(history);
+        }
+        // notifies the user when help mode is enabled or disabled
+        Toast.makeText(context, out, Toast.LENGTH_LONG).show();
+    }
+
+    // Adds current value on calculator to stored memory
     public void memAdd(){
-        // adds current value on screen to memory
+        // gets value from screen
         double screenNumber = Double.parseDouble(calcField.getText().toString());
+        // adds to memory
         memory += screenNumber;
+        // displays a toast updating the user about their action and the memory total
         String output = "Added " + screenNumber + " to memory | TOTAL: " + memory;
         Toast.makeText(context, output, Toast.LENGTH_LONG).show();
     }
 
+    // Clears the stored memory value
     public void memClear(){
+        // clears memory
         memory = 0;
+        // displays a toast updating the user about their action and the memory total
         String output = "Memory cleared.";
         Toast.makeText(context, output, Toast.LENGTH_LONG).show();
     }
 
+    // Subtracts the current calculator value from stored memory
     public void memSub(){
-        // subtracts current value to memory
+        // gets the current number from the screen
         double screenNumber = Double.parseDouble(calcField.getText().toString());
+        // subtracts from memory
         memory -= screenNumber;
+        // displays a toast updating the user about their action and the memory total
         String output = "Subtracted " + screenNumber + " from memory | TOTAL: " + memory;
         Toast.makeText(context, output, Toast.LENGTH_LONG).show();
     }
 
+    // Displays the current memory value
     public void memRecall(){
-        // adds current value to memory
         displayCalc(String.valueOf(memory));
         clearVals();
         displayHistory("CURRENT MEMORY VALUE");
     }
 
-    // lets us know that the welcome fragment has been clicked for save state
+    // saves variables for when app is in background or rotates
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentCalcText", calcField.getText().toString());
+        outState.putStringArrayList("history",  history);
+        outState.putDouble("currentAnswer", currentAnswer);
+        outState.putDouble("operand", operand);
+        outState.putDouble("memory", memory);
+        outState.putChar("lastOperation", lastOperation);
+        outState.putInt("opCounter", opCounter);
+        outState.putBoolean("negative", negative);
+        outState.putBoolean("welcomed", welcomed);
+    }
+
+    // restores variables after app comes back to front or rotates
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle saved) {
+        super.onRestoreInstanceState(saved);
+        currentCalcText = saved.getString("currentCalcText");
+        history = saved.getStringArrayList("history");
+        currentAnswer = saved.getDouble("currentAnswer");
+        operand = saved.getDouble("operand");
+        memory = saved.getDouble("memory");
+        lastOperation = saved.getChar("lastOperation");
+        opCounter = saved.getInt("opCounter");
+        negative = saved.getBoolean("negative");
+        welcomed = saved.getBoolean("welcomed");
+
+        // if the welcome screen has already been dismissed, dismiss it again on restore
+        if(welcomed){
+            welcome.b_start.performClick();
+        }
+
+        // display saved values to screen
+        displayCalc(currentCalcText);
+        currentCalcText = "";
+        displayHistory(history);
+    }
+
+    // Checks with the welcome fragment to see if it has been dismissed (used for save state)
     public void fragmentClicked(boolean isClicked){
         welcomed = isClicked;
     }
