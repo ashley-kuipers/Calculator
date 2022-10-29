@@ -315,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // When a digit/decimal is pressed, this adds it to the current working number
     public void addChar(char c){
-        if (currentCalcText.length() < 13){
+        if (currentCalcText.length() < 12){
             if(negative){
                 displaySign(true);
             } else {
@@ -361,6 +361,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         historyField.setText(print);
     }
 
+    // Overloaded function, displays the inputted text on the history textview (for help mode, etc)
+    public void displayHistory(String input){
+        historyField.setText(input);
+    }
+
     // Displays the sign on the sign textview
     public void displaySign(boolean neg){
         if (neg){
@@ -368,11 +373,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             signField.setText("");
         }
-    }
-
-    // Overloaded function, displays the inputted text on the history textview (for help mode, etc)
-    public void displayHistory(String input){
-        historyField.setText(input);
     }
 
     // The stuff that happens when an operator is pressed (+. -, /, *, =)
@@ -403,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lastOperation = op;
 
         // display running total to the calculator screen
-        if(currentAnswer<1){
+        if(currentAnswer<0){
             displayCalc(String.valueOf(currentAnswer*-1));
             displaySign(true);
         } else {

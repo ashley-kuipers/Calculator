@@ -38,12 +38,15 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_weight="10"
+            android:layout_weight="12"
             android:background="@color/lightest"
+            android:maxLines="1"
             android:padding="8dp"
             android:text="@string/def"
             android:textAlignment="textEnd"
-            android:textSize="40sp" />
+            android:textSize="40sp"
+            app:autoSizeMaxTextSize="40sp"
+            app:autoSizeMinTextSize="20sp" />
     </LinearLayout>
 
     <TextView
