@@ -1,6 +1,7 @@
 package com.example.calculatorapp2;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -30,10 +32,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Welcome welcome;
     String currentCalcText = "";
     ArrayList<String> history = new ArrayList<String>();
-    double currentAnswer = 0, operand = 0, memory = 0;
+    double memory = 0;
+    BigDecimal operand, currentAnswer;
     char lastOperation = '+';
     int opCounter=0, helped = 0;
     boolean negative = false, allClear = true, welcomed = false, helpMode = false;
+    MathContext mc = new MathContext(10, RoundingMode.HALF_EVEN);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -308,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             default:
-                error();
+                error("ERROR");
                 break;
         }
     }
@@ -333,16 +337,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             displayCalc(currentCalcText);
 
             // updates the current operand to the value on the calc screen
-            operand = Double.valueOf(currentCalcText);
+            operand = new BigDecimal(currentCalcText);
             if(negative){
-                operand *= -1;
+                operand = operand.negate();
             }
 
             // changes the clear button text to CE so if pressed, it will clear only the current number
             b_clear.setText("CE");
             allClear = false;
         } else {
-            error();
+            error("OVERFLOW ERR");
         }
 
     }
@@ -353,13 +357,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // Displays the inputted history arraylist on the history textview
-    public void displayHistory(ArrayList<String> hist){
+    public void displayHistory(@NonNull ArrayList<String> hist){
         String print = "";
         for (int i=0; i < hist.size(); i++){
             print += hist.get(i);
         }
         if (print.length()>36){
-            error();
+            error("0");
             displayHistory("HISTORY OVERFLOW ERROR");
         } else {
             historyField.setText(print);
@@ -399,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // In order to have a running total, we are always running on the previous operator
         // if this is the first operation, the current operand will display as the running total
         if(opCounter == 0){
-            currentAnswer = operand;
+            currentAnswer = new BigDecimal(operand.toPlainString());
         } else {
             // operates on the previous operator
             operate(lastOperation);
@@ -408,18 +412,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lastOperation = op;
 
         // display running total to the calculator screen
-        if(currentAnswer<0){
-            displayCalc(String.valueOf(currentAnswer*-1));
-            displaySign(true);
+        if(currentAnswer.toPlainString().length() > 12){
+            error("OVERFLOW ERR");
         } else {
-            displayCalc(String.valueOf(currentAnswer));
+            if(currentAnswer.compareTo(BigDecimal.ZERO) < 0){
+                displayCalc(currentAnswer.negate().toPlainString());
+                displaySign(true);
+            } else {
+                displayCalc(currentAnswer.toPlainString());
+            }
         }
-
-//        BigDecimal bd = BigDecimal.valueOf(currentAnswer);
-//        MathContext m = new MathContext(11);
-//        bd = bd.round(m);
-//        Log.d("TAG", "BD: " + bd);
-//        displayCalc(bd.toPlainString());
 
         // increment the operation counter
         opCounter ++;
@@ -434,28 +436,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void operate(char op){
         switch (op){
             case '+':
-                currentAnswer += operand;
+                currentAnswer = currentAnswer.add(operand);
+                Log.d("TAG", currentAnswer.toPlainString());
                 break;
 
             case '-':
-                currentAnswer -= operand;
+                currentAnswer = currentAnswer.subtract(operand);
                 break;
 
             case '*':
-                currentAnswer *= operand;
+                currentAnswer = currentAnswer.multiply(operand);
                 break;
 
             case '/':
                 // accounts for the divide by 0 scenario
-                if (operand == 0){
-                    error();
+                if (operand.equals(BigDecimal.ZERO)){
+                    error("DIVIDE BY 0 ERR");
                 } else {
-                    currentAnswer /= operand;
+                    currentAnswer = currentAnswer.divide(operand, mc);
                 }
                 break;
 
             default:
-                error();
+                error("ERROR");
                 // since we always add to the operation counter in the calculate function, need to subtract an operation if there is an error
                 opCounter--;
                 break;
@@ -484,9 +487,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Clears the stored values
     public void clearVals(){
         currentCalcText = "";
-        operand = 0;
+        operand = BigDecimal.ZERO;
         opCounter = 0;
-        currentAnswer = 0;
+        currentAnswer = BigDecimal.ZERO;
         history.clear();
     }
 
@@ -505,13 +508,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // change sign of current working number
-        operand *= -1;
+        operand = operand.negate();
 
     }
 
     // Displays an error and clears the values and history whenever an error occurs
-    public void error(){
-        displayCalc("ERROR");
+    public void error(String text){
+        displayCalc(text);
         clearVals();
         displayHistory(history);
     }
@@ -543,7 +546,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             b_help.setBackgroundColor(getResources().getColor(R.color.medium));
             b_help.setTextColor(getResources().getColor(R.color.textlight));
 
-            // redisplays currentCalcText and history from before help mode was turned on
+            // Re-displays currentCalcText and history from before help mode was turned on
             if(currentCalcText.length()>0){
                 displayCalc(currentCalcText);
             } else {
@@ -612,8 +615,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onSaveInstanceState(outState);
         outState.putString("currentCalcText", calcField.getText().toString());
         outState.putStringArrayList("history",  history);
-        outState.putDouble("currentAnswer", currentAnswer);
-        outState.putDouble("operand", operand);
         outState.putDouble("memory", memory);
         outState.putChar("lastOperation", lastOperation);
         outState.putInt("opCounter", opCounter);
@@ -621,6 +622,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean("welcomed", welcomed);
         outState.putBoolean("helpMode", helpMode);
         outState.putInt("helped", helped);
+
+        if(currentAnswer == null){
+            outState.putString("currentAnswer", "0");
+        } else {
+            outState.putString("currentAnswer", currentAnswer.toPlainString());
+        }
+
+        if(operand == null){
+            outState.putString("operand", "0");
+        } else {
+            outState.putString("operand", operand.toPlainString());
+        }
+
     }
 
     // Restores variables after app comes back to front or rotates
@@ -629,8 +643,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onRestoreInstanceState(saved);
         currentCalcText = saved.getString("currentCalcText");
         history = saved.getStringArrayList("history");
-        currentAnswer = saved.getDouble("currentAnswer");
-        operand = saved.getDouble("operand");
+        currentAnswer = BigDecimal.valueOf(saved.getDouble("currentAnswer"));
+        operand = BigDecimal.valueOf(saved.getDouble("operand"));
         memory = saved.getDouble("memory");
         lastOperation = saved.getChar("lastOperation");
         opCounter = saved.getInt("opCounter");

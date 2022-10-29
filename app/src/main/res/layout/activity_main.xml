@@ -13,7 +13,7 @@
     <FrameLayout
         android:id="@+id/layout_welcome"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
     </FrameLayout>
 
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:background="@color/lightest"
+            android:background="@color/light"
             android:padding="8dp"
             android:textAlignment="textEnd"
             android:textSize="40sp" />
@@ -57,7 +57,9 @@
         android:layout_marginBottom="6dp"
         android:background="@color/light"
         android:maxLines="1"
+        android:paddingStart="8dp"
         android:paddingTop="8dp"
+        android:paddingEnd="8dp"
         android:paddingBottom="8dp"
         android:textAlignment="textEnd"
         android:textSize="14sp" />
