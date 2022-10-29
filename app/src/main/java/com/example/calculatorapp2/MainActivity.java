@@ -32,8 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Welcome welcome;
     String currentCalcText = "";
     ArrayList<String> history = new ArrayList<String>();
-    double memory = 0;
-    BigDecimal operand, currentAnswer;
+    BigDecimal operand, currentAnswer, memory = BigDecimal.ZERO;
     char lastOperation = '+';
     int opCounter=0, helped = 0;
     boolean negative = false, allClear = true, welcomed = false, helpMode = false;
@@ -325,8 +324,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 displaySign(false);
             }
-            // adds character to the current calculator text
-            currentCalcText += c;
+            // adds character to the current calculator text (accounting for user pressing decimal first)
+            if(currentCalcText.length() == 0 && c == '.'){
+                currentCalcText += "0.";
+            } else {
+                currentCalcText += c;
+            }
 
             // displays the empty history arraylist if no operations have happened yet (effectively clears the history after the equals sign has been used)
             if(opCounter == 0){
@@ -412,15 +415,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lastOperation = op;
 
         // display running total to the calculator screen
-        if(currentAnswer.toPlainString().length() > 12){
-            error("OVERFLOW ERR");
+        String output;
+        // if answer is neg, remove sign from string, and update sign field to display neg sign
+        if(currentAnswer.compareTo(BigDecimal.ZERO) < 0){
+            output = currentAnswer.negate().toPlainString();
+            displaySign(true);
         } else {
-            if(currentAnswer.compareTo(BigDecimal.ZERO) < 0){
-                displayCalc(currentAnswer.negate().toPlainString());
-                displaySign(true);
-            } else {
-                displayCalc(currentAnswer.toPlainString());
+            output = currentAnswer.toPlainString();
+        }
+
+        if(output.length() > 12){
+            if(!(output.contains("."))){
+                // if it is too large of an integer, overflow error
+                error("OVERFLOW ERR");
+
+                // else check if it's a number with decimal somewhere in the middle, find digits on each side of decimal and round accordingly
+            } else if (output.contains(".") && output.charAt(1) != '.') {
+                // finds the number of digits before the decimal
+                int decIndex = output.indexOf(".");
+                int digBefore = output.substring(0, decIndex-1).length();
+
+                // if the number of digits before the decimal is too large, overflow error
+                if (digBefore > 12){
+                    error("OVERFLOW ERR");
+                    // else it rounds the number dynamically based on the total digits - number before the decimal
+                } else {
+                    MathContext mc2 = new MathContext(12-digBefore, RoundingMode.HALF_EVEN);
+                    BigDecimal outputTemp = new BigDecimal(output, mc2);
+                    output = outputTemp.toPlainString();
+                    displayCalc(output);
+                }
+
+                //else if the decimal is in the beginning (ie 0.###), round to 10 digits after the decimal
+            } else if(output.charAt(1) != '.') {
+                BigDecimal outputTemp = new BigDecimal(output, mc);
+                output = outputTemp.toPlainString();
+                displayCalc(output);
             }
+        } else {
+            displayCalc(output);
         }
 
         // increment the operation counter
@@ -437,7 +470,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (op){
             case '+':
                 currentAnswer = currentAnswer.add(operand);
-                Log.d("TAG", currentAnswer.toPlainString());
                 break;
 
             case '-':
@@ -473,15 +505,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             currentCalcText = "";
             b_clear.setText("AC");
             allClear = !allClear;
-            displayCalc("0");
-            displayHistory(history);
 
-        } else if(opCounter > 0 && allClear){
+        } else {
             // clear all values and history
             clearVals();
-            displayCalc("0");
-            displayHistory(history);
         }
+        displayCalc("0");
+        displayHistory(history);
     }
 
     // Clears the stored values
@@ -568,43 +598,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Adds current value on calculator to stored memory
     public void memAdd(){
         // gets value from screen
-        double screenNumber = Double.parseDouble(calcField.getText().toString());
+        BigDecimal screenNumber = new BigDecimal(calcField.getText().toString());
         if(signField.getText().toString().equals("-")){
-            screenNumber *= -1;
+            screenNumber = screenNumber.negate();
         }
-        // adds to memory
-        memory += screenNumber;
-        // displays a toast updating the user about their action and the memory total
-        String output = "Added " + screenNumber + " to memory | TOTAL: " + memory;
-        Toast.makeText(context, output, Toast.LENGTH_LONG).show();
-    }
 
-    // Clears the stored memory value
-    public void memClear(){
-        // clears memory
-        memory = 0;
+        // adds to memory
+        memory = memory.add(screenNumber);
+
         // displays a toast updating the user about their action and the memory total
-        String output = "Memory cleared.";
+        String output = "Added " + screenNumber.toPlainString() + " to memory | TOTAL: " + memory.toPlainString();
         Toast.makeText(context, output, Toast.LENGTH_LONG).show();
     }
 
     // Subtracts the current calculator value from stored memory
     public void memSub(){
         // gets the current number from the screen
-        double screenNumber = Double.parseDouble(calcField.getText().toString());
+        BigDecimal screenNumber = new BigDecimal(calcField.getText().toString());
         if(signField.getText().toString().equals("-")){
-            screenNumber *= -1;
+            screenNumber = screenNumber.negate();
         }
+
         // subtracts from memory
-        memory -= screenNumber;
+        memory = memory.subtract(screenNumber);
+
         // displays a toast updating the user about their action and the memory total
-        String output = "Subtracted " + screenNumber + " from memory | TOTAL: " + memory;
+        String output = "Subtracted " + screenNumber.toPlainString() + " from memory | TOTAL: " + memory.toPlainString();
+        Toast.makeText(context, output, Toast.LENGTH_LONG).show();
+    }
+
+    // Clears the stored memory value
+    public void memClear(){
+        // clears memory
+        memory = BigDecimal.ZERO;
+        // displays a toast updating the user about their action and the memory total
+        String output = "Memory cleared.";
         Toast.makeText(context, output, Toast.LENGTH_LONG).show();
     }
 
     // Displays the current memory value
     public void memRecall(){
-        displayCalc(String.valueOf(memory));
+        displayCalc(memory.toPlainString());
         clearVals();
         displayHistory("CURRENT MEMORY VALUE");
     }
@@ -615,12 +649,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onSaveInstanceState(outState);
         outState.putString("currentCalcText", calcField.getText().toString());
         outState.putStringArrayList("history",  history);
-        outState.putDouble("memory", memory);
         outState.putChar("lastOperation", lastOperation);
         outState.putInt("opCounter", opCounter);
         outState.putBoolean("negative", negative);
         outState.putBoolean("welcomed", welcomed);
         outState.putBoolean("helpMode", helpMode);
+        outState.putBoolean("allClear", allClear);
         outState.putInt("helped", helped);
 
         if(currentAnswer == null){
@@ -635,6 +669,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             outState.putString("operand", operand.toPlainString());
         }
 
+        if(memory == null){
+            outState.putString("memory", "0");
+        } else {
+            outState.putString("memory", memory.toPlainString());
+        }
     }
 
     // Restores variables after app comes back to front or rotates
@@ -643,14 +682,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onRestoreInstanceState(saved);
         currentCalcText = saved.getString("currentCalcText");
         history = saved.getStringArrayList("history");
+
         currentAnswer = BigDecimal.valueOf(saved.getDouble("currentAnswer"));
         operand = BigDecimal.valueOf(saved.getDouble("operand"));
-        memory = saved.getDouble("memory");
+        memory = new BigDecimal(saved.getString("memory"));
+
         lastOperation = saved.getChar("lastOperation");
         opCounter = saved.getInt("opCounter");
         negative = saved.getBoolean("negative");
         welcomed = saved.getBoolean("welcomed");
         helpMode = saved.getBoolean("helpMode");
+        helpMode = saved.getBoolean("allClear");
         helped = saved.getInt("helped");
 
         // if the welcome screen has already been dismissed, dismiss it again on restore
