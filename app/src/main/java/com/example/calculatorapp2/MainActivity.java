@@ -358,7 +358,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i=0; i < hist.size(); i++){
             print += hist.get(i);
         }
-        historyField.setText(print);
+        if (print.length()>36){
+            error();
+            displayHistory("HISTORY OVERFLOW ERROR");
+        } else {
+            historyField.setText(print);
+        }
     }
 
     // Overloaded function, displays the inputted text on the history textview (for help mode, etc)
