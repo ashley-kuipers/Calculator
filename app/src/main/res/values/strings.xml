@@ -7,7 +7,7 @@
     <string name="backspace">&lt;</string>
     <string name="memsub">M-</string>
     <string name="memadd">M+</string>
-    <string name="divide">/</string>
+    <string name="divide">&#247;</string>
     <string name="multiply">*</string>
     <string name="seven">7</string>
     <string name="eight">8</string>

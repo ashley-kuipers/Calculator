@@ -21,19 +21,16 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    // regular stuff
-    // TODO: Figure out rounding
-    // TODO: suppress leading zeroes
 
     // Declaring global variables
     Button b_help, b_memclear, b_memrecall, b_clear, b_backspace, b_memsub, b_memadd, b_divide, b_seven, b_eight, b_nine, b_multiply, b_four, b_five, b_six, b_sub, b_one, b_two, b_three, b_add, b_sign, b_decimal, b_zero, b_equal;
     TextView calcField, historyField, signField;
     Context context;
     Welcome welcome;
-    String currentCalcText = "";
+    String currentCalcText = "", operations = "+-/*=";
     ArrayList<String> history = new ArrayList<String>();
-    BigDecimal operand, currentAnswer, memory = BigDecimal.ZERO;
-    char lastOperation = '+';
+    BigDecimal operand, currentAnswer, memory = BigDecimal.ZERO, helpModeNumBefore;
+    char lastOperation = '+', lastChar;
     int opCounter=0, helped = 0;
     boolean negative = false, allClear = true, welcomed = false, helpMode = false;
     MathContext mc = new MathContext(10, RoundingMode.HALF_EVEN);
@@ -123,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number zero");
                 } else {
                     addChar('0');
+                    lastChar = '0';
                 }
                 break;
 
@@ -131,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number one");
                 } else {
                     addChar('1');
+                    lastChar = '1';
                 }
                 break;
 
@@ -139,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number two");
                 } else {
                     addChar('2');
+                    lastChar = '2';
                 }
                 break;
 
@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number three");
                 } else {
                     addChar('3');
+                    lastChar = '3';
                 }
                 break;
 
@@ -155,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number four");
                 } else {
                     addChar('4');
+                    lastChar = '4';
                 }
                 break;
 
@@ -163,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number five");
                 } else {
                     addChar('5');
+                    lastChar = '5';
                 }
                 break;
 
@@ -171,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number six");
                 } else {
                     addChar('6');
+                    lastChar = '6';
                 }
                 break;
 
@@ -179,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number seven");
                 } else {
                     addChar('7');
+                    lastChar = '7';
                 }
                 break;
 
@@ -187,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number eight");
                 } else {
                     addChar('8');
+                    lastChar = '8';
                 }
                 break;
 
@@ -195,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("The number nine");
                 } else {
                     addChar('9');
+                    lastChar = '9';
                 }
                 break;
 
@@ -202,7 +209,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (helpMode){
                     displayHistory("The decimal point");
                 } else {
-                    addChar('.');
+                    // check if has a decimal already
+                    if(currentCalcText.contains(".")) {
+                        error("ERROR");
+                    } else {
+                        addChar('.');
+                        lastChar = '.';
+                    }
+
                 }
                 break;
 
@@ -215,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 } else {
                     clear();
+                    lastChar = 'c';
                 }
                 break;
 
@@ -223,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Backspace: remove one character at a time.");
                 } else {
                     backspace();
+                    lastChar = 'b';
                 }
                 break;
 
@@ -231,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Change sign of number on screen");
                 } else {
                     sign();
+                    lastChar = 's';
                 }
                 break;
 
@@ -239,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Addition button");
                 } else {
                     calculate('+');
+                    lastChar = '+';
                 }
                 break;
 
@@ -247,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Subtraction button");
                 } else {
                     calculate('-');
+                    lastChar = '-';
                 }
                 break;
 
@@ -255,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Multiply button");
                 } else {
                     calculate('*');
+                    lastChar = '*';
                 }
                 break;
 
@@ -263,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Divide button");
                 } else {
                     calculate('/');
+                    lastChar = '/';
                 }
                 break;
 
@@ -271,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Equals button");
                 } else {
                     calculate('=');
+                    lastChar = '=';
                 }
                 break;
 
@@ -279,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Adds number on screen to current memory value");
                 } else {
                     memAdd();
+                    lastChar = 'm';
                 }
                 break;
 
@@ -287,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Subtracts number on screen from memory value");
                 } else {
                     memSub();
+                    lastChar = 'm';
                 }
                 break;
 
@@ -295,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Clears current stored memory value");
                 } else {
                     memClear();
+                    lastChar = 'm';
                 }
                 break;
 
@@ -303,11 +328,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     displayHistory("Displays current stored memory value");
                 } else {
                     memRecall();
+                    lastChar = 'm';
                 }
                 break;
 
             case R.id.b_help:
                 help();
+                lastChar = 'h';
                 break;
 
             default:
@@ -319,11 +346,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // When a digit/decimal is pressed, this adds it to the current working number
     public void addChar(char c){
         if (currentCalcText.length() < 12){
+            // account for sign
             if(negative){
                 displaySign(true);
             } else {
                 displaySign(false);
             }
+
             // adds character to the current calculator text (accounting for user pressing decimal first)
             if(currentCalcText.length() == 0 && c == '.'){
                 currentCalcText += "0.";
@@ -336,16 +365,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 displayHistory(history);
             }
 
-            // displays the current number on calc screen
-            displayCalc(currentCalcText);
-
             // updates the current operand to the value on the calc screen
             operand = new BigDecimal(currentCalcText);
+
+            // displays the current number on calc screen (using BigDecimal as this will suppress leading 0's)
+            displayCalc(operand.toPlainString());
+
+            // if sign was changed, adjust operand
             if(negative){
                 operand = operand.negate();
             }
 
-            // changes the clear button text to CE so if pressed, it will clear only the current number
+            // change the clear button text to CE
             b_clear.setText("CE");
             allClear = false;
         } else {
@@ -389,79 +420,88 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // The stuff that happens when an operator is pressed (+. -, /, *, =)
     public void calculate(char op){
-        // add currentCalcText and the current operation to history, and displays on history field
-        if(negative){
-            history.add("-" + currentCalcText);
+        if(operations.contains(String.valueOf(lastChar))){
+            error("ERROR");
         } else {
-            history.add(currentCalcText);
-        }
-        history.add(String.valueOf(op));
-        displayHistory(history);
+            // add currentCalcText and the current operation to history, and displays on history field
+            if (currentCalcText.length() > 0){
+                BigDecimal tempOut = new BigDecimal(currentCalcText);
+                currentCalcText = tempOut.toPlainString();
+            }
+            if(negative){
+                history.add("-" + currentCalcText);
+            } else {
+                history.add(currentCalcText);
+            }
+            history.add(String.valueOf(op));
+            displayHistory(history);
 
-        // clears the calcText (so a new number can be started)
-        currentCalcText = "";
-        negative = false;
+            // clears the calcText (so a new number can be started)
+            currentCalcText = "";
+            negative = false;
 
-        // operate on numbers
-        // In order to have a running total, we are always running on the previous operator
-        // if this is the first operation, the current operand will display as the running total
-        if(opCounter == 0){
-            currentAnswer = new BigDecimal(operand.toPlainString());
-        } else {
-            // operates on the previous operator
-            operate(lastOperation);
-        }
-        // updates previous operation with value of the current one
-        lastOperation = op;
+            // operate on numbers
+            // In order to have a running total, we are always running on the previous operator
+            // if this is the first operation, the current operand will display as the running total
+            if(opCounter == 0){
+                currentAnswer = new BigDecimal(operand.toPlainString());
+            } else {
+                // operates on the previous operator
+                operate(lastOperation);
+            }
+            // updates previous operation with value of the current one
+            lastOperation = op;
 
-        // display running total to the calculator screen
-        String output;
-        // if answer is neg, remove sign from string, and update sign field to display neg sign
-        if(currentAnswer.compareTo(BigDecimal.ZERO) < 0){
-            output = currentAnswer.negate().toPlainString();
-            displaySign(true);
-        } else {
-            output = currentAnswer.toPlainString();
-        }
+            // display running total to the calculator screen
+            String output;
+            // if answer is neg, remove sign from string, and update sign field to display neg sign
+            if(currentAnswer.compareTo(BigDecimal.ZERO) < 0){
+                output = currentAnswer.negate().toPlainString();
+                displaySign(true);
+            } else {
+                output = currentAnswer.toPlainString();
+            }
 
-        if(output.length() > 12){
-            if(!(output.contains("."))){
-                // if it is too large of an integer, overflow error
-                error("OVERFLOW ERR");
-
-                // else check if it's a number with decimal somewhere in the middle, find digits on each side of decimal and round accordingly
-            } else if (output.contains(".") && output.charAt(1) != '.') {
-                // finds the number of digits before the decimal
-                int decIndex = output.indexOf(".");
-                int digBefore = output.substring(0, decIndex-1).length();
-
-                // if the number of digits before the decimal is too large, overflow error
-                if (digBefore > 12){
+            // Formats the output if it is too big to fit on the screen
+            if(output.length() > 12){
+                if(!(output.contains("."))){
+                    // if it is too large of an integer, overflow error
                     error("OVERFLOW ERR");
-                    // else it rounds the number dynamically based on the total digits - number before the decimal
-                } else {
-                    MathContext mc2 = new MathContext(12-digBefore, RoundingMode.HALF_EVEN);
-                    BigDecimal outputTemp = new BigDecimal(output, mc2);
+
+                    // else check if it's a number with decimal somewhere in the middle, find digits on each side of decimal and round accordingly
+                } else if (output.contains(".") && output.charAt(1) != '.') {
+                    // finds the number of digits before the decimal
+                    int decIndex = output.indexOf(".");
+                    int digBefore = output.substring(0, decIndex-1).length();
+
+                    // if the number of digits before the decimal is too large, overflow error
+                    if (digBefore > 12){
+                        error("OVERFLOW ERR");
+                        // else it rounds the number dynamically based on the total digits - number before the decimal
+                    } else {
+                        MathContext mc2 = new MathContext(12-digBefore, RoundingMode.HALF_EVEN);
+                        BigDecimal outputTemp = new BigDecimal(output, mc2);
+                        output = outputTemp.toPlainString();
+                        displayCalc(output);
+                    }
+
+                    //else if the decimal is in the beginning (ie 0.###), round to 10 digits after the decimal
+                } else if(output.charAt(1) != '.') {
+                    BigDecimal outputTemp = new BigDecimal(output, mc);
                     output = outputTemp.toPlainString();
                     displayCalc(output);
                 }
-
-                //else if the decimal is in the beginning (ie 0.###), round to 10 digits after the decimal
-            } else if(output.charAt(1) != '.') {
-                BigDecimal outputTemp = new BigDecimal(output, mc);
-                output = outputTemp.toPlainString();
+            } else {
                 displayCalc(output);
             }
-        } else {
-            displayCalc(output);
+
+            // increment the operation counter
+            opCounter ++;
+
+            // change clear button text back to AC
+            b_clear.setText("AC");
+            allClear = true;
         }
-
-        // increment the operation counter
-        opCounter ++;
-
-        // change clear button text back to AC
-        b_clear.setText("AC");
-        allClear = true;
 
     }
 
@@ -559,6 +599,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void help(){
         String out = "";
         if(!helpMode){
+            helpModeNumBefore = new BigDecimal((String) calcField.getText());
             // turn help mode on
             helpMode = true;
 
@@ -577,11 +618,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             b_help.setTextColor(getResources().getColor(R.color.textlight));
 
             // Re-displays currentCalcText and history from before help mode was turned on
-            if(currentCalcText.length()>0){
-                displayCalc(currentCalcText);
-            } else {
-                displayCalc("0");
-            }
+            displayCalc(helpModeNumBefore.toPlainString());
             displayHistory(history);
 
             // update output for toast
@@ -683,8 +720,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentCalcText = saved.getString("currentCalcText");
         history = saved.getStringArrayList("history");
 
-        currentAnswer = BigDecimal.valueOf(saved.getDouble("currentAnswer"));
-        operand = BigDecimal.valueOf(saved.getDouble("operand"));
+        currentAnswer = new BigDecimal(saved.getString("currentAnswer"));
+        operand = new BigDecimal(saved.getString("operand"));
         memory = new BigDecimal(saved.getString("memory"));
 
         lastOperation = saved.getChar("lastOperation");
@@ -692,7 +729,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         negative = saved.getBoolean("negative");
         welcomed = saved.getBoolean("welcomed");
         helpMode = saved.getBoolean("helpMode");
-        helpMode = saved.getBoolean("allClear");
+        allClear = saved.getBoolean("allClear");
         helped = saved.getInt("helped");
 
         // if the welcome screen has already been dismissed, dismiss it again on restore
@@ -700,10 +737,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             welcome.b_start.performClick();
         }
 
+        // display saved values to screen
+        displayCalc(currentCalcText);
+        displayHistory(history);
+
         // if was in help mode before, activate again
         if(helpMode){
             b_help.setBackgroundColor(getResources().getColor(R.color.lightest));
             b_help.setTextColor(getResources().getColor(R.color.text));
+        } else {
+            currentCalcText = "";
         }
 
         // if number was negative before, display sign
@@ -711,10 +754,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             displaySign(true);
         }
 
-        // display saved values to screen
-        displayCalc(currentCalcText);
-        currentCalcText = "";
-        displayHistory(history);
     }
 
     // Checks with the welcome fragment to see if it has been dismissed (used for save state)
