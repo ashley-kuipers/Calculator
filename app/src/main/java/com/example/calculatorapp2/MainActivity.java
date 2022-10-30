@@ -1,3 +1,6 @@
+//Ashley Kuipers | T00713040 | Fall 2022 | COMP 2161
+// Please check out the README.md for documentation on the application
+
 package com.example.calculatorapp2;
 
 import androidx.annotation.NonNull;
